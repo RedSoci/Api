@@ -1,11 +1,14 @@
 import { database } from "../db";
 import {DataTypes,fn} from "sequelize";
 export const followSchema = database.define('follow',{
+    id:{
+        type:DataTypes.INTEGER,
+        primaryKey:true,
+        autoIncrement:true
+    },
     user:{
         type:DataTypes.INTEGER,
         references:{model:"users",key:"id"},
-        primaryKey:true,
-        onDelete:"CASCADE"
     },
     follow:{
         type:DataTypes.INTEGER,
@@ -14,7 +17,6 @@ export const followSchema = database.define('follow',{
         onDelete:"CASCADE"
     },
     date:{
-        type:DataTypes.DATE,
-        defaultValue:fn("CURRENT_TIMESTAMP")
+        type:DataTypes.DATE
     }
 });

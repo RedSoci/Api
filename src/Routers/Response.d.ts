@@ -1,5 +1,6 @@
+export type ResultsFromRequest = "OK"|"INVALID_DATA"|"NOT_EXIST"|"INVALID_PATH"
 export interface defaultResponse<DATA = null> {
-    status:number,
-    errorMessage?:string,
+    result:ResultsFromRequest
+    message?:string
     data:DATA
 }

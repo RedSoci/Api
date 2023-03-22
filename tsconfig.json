@@ -4,5 +4,8 @@
         "outDir": "./dist",
         "incremental": true,
         "esModuleInterop": true
+    },
+    "ts-node": {
+        "files": true
     }
 }

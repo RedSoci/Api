@@ -6,24 +6,35 @@ if(!process.env.NODE_ENV){
 const SERVER_PATH = "server"
 import { database } from "./db";
 
-import { userSchema } from "./schemas/user";
-import { messageSchema } from "./schemas/message";
-import { followSchema } from "./schemas/follow";
 
 import userRouter from "./Routers/server/user";
 import express from "express"
-var app = express()
-app.use(express.json());
-app.use("/server",userRouter);
 
-app.listen(4000)
+import { userSchema } from "./schemas/user";
+import { messageSchema } from "./schemas/message";
+import { followSchema } from "./schemas/follow";
+start()
 async function start() {
     await database.authenticate({logging:true,retry:{
-        max:5,
-        timeout:3000
+        max:8,
+        timeout:5000,
+        backoffBase:500
     }});
-    userSchema.hasMany(messageSchema,{foreignKey:'userSchemaid'});
+    //await userSchema.sync({alter:true})
+    //await messageSchema.sync()
+    //await followSchema.sync()
+    userSchema.hasMany(messageSchema,{foreignKey:'userid'})
     userSchema.hasMany(followSchema,{foreignKey:'follow'})
-    userSchema.hasOne(followSchema,{foreignKey:'userSchema'});
+    userSchema.hasOne(followSchema,{foreignKey:"user"})
+    for(const schema of [userSchema,messageSchema,followSchema]){
+        await schema.sync({alter:true})
+    }
     await database.sync();
+
+    var app = express()
+    
+    app.use(express.json())
+    app.use("/server",userRouter)
+    
+    app.listen(4000)
 }

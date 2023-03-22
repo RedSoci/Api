@@ -1,23 +1,34 @@
 import { database } from "../db";
-import {DataTypes} from "sequelize";
-export const userSchema = database.define('user',{
+import {DataTypes,Model,ModelAttributes, Optional} from "sequelize";
+
+interface attributes {
+    id:number,
+    name:String,
+    username:string,
+    email:string,
+    password:string
+}
+type creationAttrs  = Optional<attributes,"id">
+const obj:ModelAttributes<Model<attributes,creationAttrs>,attributes> = {
     id:{
         type:DataTypes.INTEGER,
         autoIncrement:true,
         primaryKey:true
     },
     name:{
-        type:DataTypes.CHAR,
+        type:DataTypes.STRING,
         allowNull:false
     },
     username:{
-        type:DataTypes.CHAR(50)
+        type:DataTypes.STRING(50),
+        unique:true
     },
     email:{
-        type:DataTypes.CHAR
+        type:DataTypes.STRING
     },
     password:{
-        type:DataTypes.CHAR(56),
+        type:DataTypes.STRING(56),
         allowNull:false
     }
-});
+}
+export const userSchema =database.define('user',obj);

@@ -1,0 +1,29 @@
+services:
+  redsoci-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - ./src:/app/src
+    ports:
+      - '8080:4000'
+    depends_on:
+      - db
+    command: npm run dev
+    container_name: redsoci-api
+  db:
+    container_name: db
+    image: postgres
+    restart: always
+    command: -p 3200
+    environment: 
+      POSTGRES_DB: "redSocial"
+      POSTGRES_PASSWORD: "TEST_SERVER"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 3200:3200

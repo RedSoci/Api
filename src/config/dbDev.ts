@@ -1,7 +1,12 @@
-export ={
-    "host":"localhost",
-    "port":3306,
+import { Options } from "sequelize"
+
+export = <Options>{
+    
+    "host":"db",
+    "port":3200,
     "database":"redSocial",
-    "username":"root",
-    "dialect":"mysql"
+    "username":"postgres",
+    "password":"TEST_SERVER",
+    "dialect":"postgres",
+    "protocol":"postgres"
 }
