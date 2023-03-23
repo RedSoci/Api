@@ -1,6 +1,6 @@
 import { database } from "../db";
 import {DataTypes,fn} from "sequelize";
-export const followSchema = database.define('follow',{
+export const followModel = database.define('follow',{
     id:{
         type:DataTypes.INTEGER,
         primaryKey:true,

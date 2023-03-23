@@ -7,12 +7,12 @@ const SERVER_PATH = "server"
 import { database } from "./db";
 
 
-import userRouter from "./Routers/server/user";
+import userRouter from "./routers/server/user";
 import express from "express"
 
-import { userSchema } from "./schemas/user";
-import { messageSchema } from "./schemas/message";
-import { followSchema } from "./schemas/follow";
+import { userModel } from "./models/user";
+import { messageModel } from "./models/message";
+import { followModel } from "./models/follow";
 start()
 async function start() {
     await database.authenticate({logging:true,retry:{
@@ -20,13 +20,10 @@ async function start() {
         timeout:5000,
         backoffBase:500
     }});
-    //await userSchema.sync({alter:true})
-    //await messageSchema.sync()
-    //await followSchema.sync()
-    userSchema.hasMany(messageSchema,{foreignKey:'userid'})
-    userSchema.hasMany(followSchema,{foreignKey:'follow'})
-    userSchema.hasOne(followSchema,{foreignKey:"user"})
-    for(const schema of [userSchema,messageSchema,followSchema]){
+    userModel.hasMany(messageModel,{foreignKey:'userid',onDelete:"CASCADE"})
+    userModel.hasMany(followModel,{foreignKey:'follow'})
+    userModel.hasOne(followModel,{foreignKey:"user"})
+    for(const schema of [userModel,messageModel,followModel]){
         await schema.sync({alter:true})
     }
     await database.sync();

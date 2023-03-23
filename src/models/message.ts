@@ -1,6 +1,6 @@
 import { database } from "../db";
 import {DataTypes,fn} from "sequelize";
-export const messageSchema = database.define('message',{
+export const messageModel = database.define('message',{
     id:{
         type:DataTypes.INTEGER,
         autoIncrement:true,

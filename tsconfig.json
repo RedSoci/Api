@@ -3,7 +3,9 @@
         "rootDir": "./src",
         "outDir": "./dist",
         "incremental": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "target": "ES2018",
+        "moduleResolution": "node"
     },
     "ts-node": {
         "files": true

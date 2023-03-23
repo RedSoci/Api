@@ -1,15 +1,15 @@
 import { database } from "../db";
 import {DataTypes,Model,ModelAttributes, Optional} from "sequelize";
 
-interface attributes {
+export interface userSchemaAttributes {
     id:number,
     name:String,
     username:string,
     email:string,
     password:string
 }
-type creationAttrs  = Optional<attributes,"id">
-const obj:ModelAttributes<Model<attributes,creationAttrs>,attributes> = {
+type creationAttrs  = Optional<userSchemaAttributes,"id">
+const obj:ModelAttributes<Model<userSchemaAttributes,creationAttrs>,userSchemaAttributes> = {
     id:{
         type:DataTypes.INTEGER,
         autoIncrement:true,
@@ -31,4 +31,4 @@ const obj:ModelAttributes<Model<attributes,creationAttrs>,attributes> = {
         allowNull:false
     }
 }
-export const userSchema =database.define('user',obj);
+export const userModel =database.define('user',obj);
