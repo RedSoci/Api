@@ -1,7 +1,7 @@
 import express from "express"
 import { userModel,userSchemaAttributes } from "../../models/user"
 import sha224 from "crypto-js/sha224"
-import {Resp, ResponseList} from "../utils"
+import {GetId, Resp, ResponseList} from "../utils"
 import { GetRequest,GetRequestById, PostRequest } from "../Request"
 
 const PATH_ROUTER = "/users"
@@ -19,18 +19,12 @@ userRouter.get(PATH_ROUTER,async function(req:getRequest,res){
         Resp(res,400,"INVALID_DATA",null,"use: "+PATH_ROUTER+"/<USER_ID>")
         return;
     }
-    //var list = new ResponseList(userModel);
-    var order:[string,string] = ["id","DESC"]
-    if(typeof info.sort === "string"){
-        var data =info.sort.split('_')
-        if(data.length === 1){
-            data.push("DESC")
-        }
-        if(data.length === 2){
-            order =<[string,string]> data
-        }
-    }
-    var page = info.page || 1
+    var list = new ResponseList(userModel);
+
+    list.attrs = RETURN_ATTRS
+    list.page = info.page
+    list.sort = info.sort
+
     delete info.sort;
     delete info.page;
 
@@ -42,10 +36,7 @@ userRouter.get(PATH_ROUTER,async function(req:getRequest,res){
         if(info.username){
             where.username = info.username
         }
-        var resultUser =await userModel.findOne({
-            attributes:RETURN_ATTRS,
-            where
-        })
+        var resultUser =await list.findOne({where});
         if(resultUser){
             Resp(res,200,"OK",resultUser.toJSON())
         }else{
@@ -53,13 +44,7 @@ userRouter.get(PATH_ROUTER,async function(req:getRequest,res){
         }
         return;
     }else{
-        var results =await userModel.findAll({
-            where:info,
-            order:[order],
-            limit:10,
-            offset: 10 * (page - 1),
-            attributes:RETURN_ATTRS
-        })
+        var results =await list.findAll()
         Resp(res,200,"OK",results.map(e=>e.toJSON()));
     }
 })
@@ -85,16 +70,17 @@ userRouter.post(PATH_ROUTER,async function(req:postRequest,res){
         Resp(res,201,"OK",null)
     }catch(e){
         if(e.name === "SequelizeUniqueConstraintError"){
-            Resp(res,400,"INVALID_DATA",{fields:Object.keys(e.fields)},"username already exist");
+            Resp(res,400,"ALREADY_EXIST",{fields:Object.keys(e.fields)},"username already exist");
         }
+        Resp(res,400,"INVALID_DATA",{fields:Object.keys(e.fields)});
     }
 
 })
 
 //Operations specifies users using id
 userRouter.get(PATH_ROUTER+"/:id",async function(req:GetRequestById,res){
-    var userId =Number(req.params.id);
-    if(!Number.isInteger(userId)){
+    var userId =GetId(req.params.id);
+    if(!userId){
         Resp(res,400,"INVALID_PATH",null,"passed user id not is number")
         return
     }
@@ -107,28 +93,21 @@ userRouter.get(PATH_ROUTER+"/:id",async function(req:GetRequestById,res){
    }
 })
 userRouter.post(PATH_ROUTER+"/:id",async function(req:GetRequestById<userAttrs>,res){
-    var {email,password,username,name} = req.body
-    var id = Number(req.params.id)
-    if(Number.isInteger(id)){
-        var obj = {};
-        Object.entries({email,password,username,name}).forEach(e=>{
-            if(typeof e[1] === "string"){
-                obj[e[0]] = e[1]
-            }
-        })
-        var result = await userModel.update(obj,{where:{id}})
-        if(!result[0]){
-            Resp(res,400,"NOT_EXIST")
-        }else{
-            Resp(res,201,"OK")
-        }
-        return;
+    var id = GetId(req.params.id)
+    if(!id){
+        Resp(res,400,"INVALID_DATA")
+        return
     }
-    Resp(res,400,"INVALID_DATA")
+    var result = await userModel.update(req.body,{where:{id}})
+    if(!result[0]){
+        Resp(res,400,"NOT_EXIST")
+    }else{
+        Resp(res,201,"OK")
+    }
 })
 userRouter.delete(PATH_ROUTER+"/:id",async function(req:GetRequestById,res){
-    var id = Number(req.params.id)
-    if(!Number.isInteger(id)){
+    var id = GetId(req.params.id)
+    if(!id){
         Resp(res,400,"INVALID_DATA",null,"id not is a number")
         return
     }
