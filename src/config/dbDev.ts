@@ -1,6 +1,6 @@
 import { Options } from "sequelize"
 
-export = <Options>{
+export default <Options>{
     
     "host":"db",
     "port":3200,

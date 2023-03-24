@@ -1,9 +1,10 @@
 {
   "name": "redsoci-api",
   "type": "commonjs",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "NODE_PATH=./lib node node lib/index.js",
+    "build": "tsc && node build/rename.js",
+    "start": "NODE_PATH=./dist node ./dist/index.js",
     "dev": "nodemon src/index.ts"
   },
   "dependencies": {

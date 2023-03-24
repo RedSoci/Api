@@ -1,9 +1,9 @@
-import express from "express"
+import * as express from "express"
 import { userModel,userSchemaAttributes } from "../../models/user"
-import sha224 from "crypto-js/sha224"
+import * as CryptoJs from "crypto-js"
 import {GetId, Resp, ResponseList} from "../utils"
 import { GetRequest,GetRequestById, PostRequest } from "../Request"
-
+const {SHA224} = CryptoJs;
 const PATH_ROUTER = "/users"
 const RETURN_ATTRS = ["name","username","email","createdAt","updatedAt","id"]
 
@@ -31,7 +31,7 @@ userRouter.get(PATH_ROUTER,async function(req:getRequest,res){
     if(info.username || info.password){
         var where:{[index:string]:any} = {}
         if(info.password){
-            where.password = sha224(info.password).toString()
+            where.password = SHA224(info.password).toString()
         }
         if(info.username){
             where.username = info.username
@@ -59,7 +59,7 @@ userRouter.post(PATH_ROUTER,async function(req:postRequest,res){
         return;
     }
 
-    var cryptedPassword = sha224(password).toString();
+    var cryptedPassword = SHA224(password).toString();
     try{
         await userModel.create({
             email,

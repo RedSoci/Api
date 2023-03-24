@@ -1,20 +1,23 @@
 import {config} from "dotenv"
 config();
 if(!process.env.NODE_ENV){
-    process.env.NODE_ENV = "development"
+    process.env.NODE_ENV = "development";
+    console.warn("No NODE_ENV defined, defined to \"development\"");
 }
 const SERVER_PATH = "server"
 import { database } from "./db";
 
 
 import userRouter from "./routers/server/user";
-import express from "express"
+import * as express from "express"
 
 import { userModel } from "./models/user";
 import { messageModel } from "./models/message";
 import { followModel } from "./models/follow";
-start()
-async function start() {
+if(require.main === module){
+    start()
+}
+export async function start() {
     await database.authenticate({logging:true,retry:{
         max:8,
         timeout:5000,

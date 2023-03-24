@@ -2,10 +2,10 @@
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./dist",
-        "incremental": true,
-        "esModuleInterop": true,
         "target": "ES2018",
-        "moduleResolution": "node"
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "removeComments": true,
     },
     "ts-node": {
         "files": true
