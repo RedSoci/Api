@@ -71,8 +71,9 @@ userRouter.post(PATH_ROUTER,async function(req:postRequest,res){
     }catch(e){
         if(e.name === "SequelizeUniqueConstraintError"){
             Resp(res,400,"ALREADY_EXIST",{fields:Object.keys(e.fields)},"username already exist");
+        }else{
+            Resp(res,400,"INVALID_DATA",{fields:Object.keys(e.fields)});
         }
-        Resp(res,400,"INVALID_DATA",{fields:Object.keys(e.fields)});
     }
 
 })

@@ -3,15 +3,48 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
+    volumes:
+      - ./src:/usr/src/app
+    ports:
+      - '8080:4000'
+    depends_on:
+      - db
+    command: npm start
+    container_name: redsoci-api
+    profiles:
+      - deployment
+
+  redsoci-api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    volumes:
+      - ./src:/usr/src/app
+    ports:
+      - '8080:4000'
+    depends_on:
+      - db
+    command: npm run test
+    container_name: redsoci-api-test
+    profiles:
+      - test
+  redsoci-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
       target: base
     volumes:
-      - ./src:/app/src
+      - ./src:/usr/src/app/src
     ports:
       - '8080:4000'
     depends_on:
       - db
     command: npm run dev
-    container_name: redsoci-api
+    container_name: redsoci-api-dev
+    profiles:
+      - dev
   db:
     container_name: db
     image: postgres
