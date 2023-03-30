@@ -1,0 +1,832 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "RedSoci API",
+        "version": "0.0.1",
+        "description": "General API to database connect",
+        "contact": {
+            "name": "Daniel Silva Rocha"
+        },
+        "license": {
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "paths": {
+        "/users": {
+            "summary": "Path used to manage the list of users.",
+            "description": "The REST endpoint/path used to list and create zero or more `User` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
+            "servers": [
+                {
+                    "url": "http://{domain}:{port}/server/v1",
+                    "description": "The server entry point",
+                    "variables": {
+                        "domain": {
+                            "default": "localhost"
+                        },
+                        "port": {
+                            "default": "5005"
+                        }
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "description": "Select the page from result",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "in": "query"
+                    },
+                    {
+                        "examples": {
+                            "basic": {
+                                "value": "name_ASC"
+                            }
+                        },
+                        "name": "sort",
+                        "description": "sort users by column name AND order(ASC|DESC)",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query"
+                    },
+                    {
+                        "examples": {
+                            "basic": {
+                                "value": "name,\"Daniel%\",email,\"dan%\""
+                            }
+                        },
+                        "name": "filter",
+                        "description": "Filter results",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns an array of `User` entities."
+                    },
+                    "403": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "basic": {
+                                        "value": {
+                                            "error": "forbidden_request"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Returned when only password is passed.\nit's happen to prevent massive discover from users passwords"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "summary": "List All Users",
+                "description": "Gets a list of all `User` entities.\nshow 10 users by page"
+            },
+            "post": {
+                "requestBody": {
+                    "description": "A new `Users` to be created.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User_create"
+                            },
+                            "examples": {
+                                "basic example": {
+                                    "value": {
+                                        "name": "Daniel Silva",
+                                        "username": "Danixt",
+                                        "password": "anp221@SA",
+                                        "email": "danie1@agr.com"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created with success."
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error_malformedData"
+                                },
+                                "examples": {
+                                    "General case": {
+                                        "value": {
+                                            "error": "malformed_data",
+                                            "props": {
+                                                "name": "missing"
+                                            }
+                                        }
+                                    },
+                                    "unsafe only": {
+                                        "value": {
+                                            "error": "malformed_data",
+                                            "props": {
+                                                "name": "too_small",
+                                                "email": "incorrect_pattern"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Return Case some properties not are presents.\ncase the security is `INSECURY_SERVER_KEY` check and test the properties and return wrong properties"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "Basic example": {
+                                        "value": {
+                                            "error": "already_exist",
+                                            "conflict": [
+                                                "username"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Returned case the username already registred"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "createUser",
+                "summary": "Create a Users",
+                "description": "Creates a new instance of a `User`."
+            }
+        },
+        "/users/{userId}": {
+            "summary": "Path used to manage a single Users.",
+            "description": "The REST endpoint/path used to get, update, and delete single instances of an `User`.  This path contains `GET`, `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks, respectively.",
+            "servers": [
+                {
+                    "url": "http://{domain}:{port}/server/v1",
+                    "description": "The server entry point",
+                    "variables": {
+                        "domain": {
+                            "default": "localhost"
+                        },
+                        "port": {
+                            "default": "5005"
+                        }
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns a single `Users`."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "getUser",
+                "summary": "Get a User",
+                "description": "Gets the details of a single instance of a `User`."
+            },
+            "put": {
+                "requestBody": {
+                    "description": "Updated `User` information.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserBase"
+                            },
+                            "examples": {
+                                "basic": {
+                                    "value": {
+                                        "name": "Daniel silver"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful response."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "updateUsers",
+                "summary": "Update a User",
+                "description": "Updates an existing `User`."
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "deleteUser",
+                "summary": "Delete a User",
+                "description": "Deletes an existing `User`."
+            },
+            "parameters": [
+                {
+                    "name": "userId",
+                    "description": "A unique identifier for a `User`.",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/posts/{postId}": {
+            "summary": "Path used to manage a single post.",
+            "description": "The REST endpoint/path used to get, update, and delete single instances of an `post`.  This path contains `GET`, `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks, respectively.",
+            "servers": [
+                {
+                    "url": "http://{domain}:{port}/server/v1",
+                    "description": "The server entry point",
+                    "variables": {
+                        "domain": {
+                            "default": "localhost"
+                        },
+                        "port": {
+                            "default": "5005"
+                        }
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Post"
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns a single `post`."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "getpost",
+                "summary": "Get a post",
+                "description": "Gets the details of a single instance of a `post`."
+            },
+            "put": {
+                "requestBody": {
+                    "description": "Updated `post` information.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Post"
+                            },
+                            "examples": {
+                                "post update": {
+                                    "value": {
+                                        "content": "More other beautiful day",
+                                        "deleted": false,
+                                        "private": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful response."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "security": [
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "updatepost",
+                "summary": "Update a post",
+                "description": "Updates an existing `post`."
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "operationId": "deletepost",
+                "summary": "Delete a post",
+                "description": "Deletes an existing `post`.\nif the post just doesn't need to be displayed anymore, just set the `delete` property to true.\nuse this method only for privacy concerns."
+            },
+            "parameters": [
+                {
+                    "name": "postId",
+                    "description": "A unique identifier for a `post`.",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/posts": {
+            "summary": "Path used to manage the list of posts.",
+            "description": "The REST endpoint/path used to list and create zero or more `post` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
+            "servers": [
+                {
+                    "url": "http://{domain}:{port}/server/v1",
+                    "description": "The server entry point",
+                    "variables": {
+                        "domain": {
+                            "default": "localhost"
+                        },
+                        "port": {
+                            "default": "5005"
+                        }
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Post"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns an array of `post` entities."
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "getposts",
+                "summary": "List All posts",
+                "description": "Gets a list of all `post` entities."
+            },
+            "post": {
+                "requestBody": {
+                    "description": "A new `post` to be created.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/post_create"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successful response."
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "createpost",
+                "summary": "Create a post",
+                "description": "Creates a new instance of a `post`."
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Error_Data_props": {
+                "description": "Define the possible errors in properties.\n`missing`: The Property is expected, but not passed\n`invalid_type`: incorrect type, ex: expected string but returned number\n`not_exist`: the property don't exist in API (only throws with token `UNSAFE_SERVER_KEY`)\n`incorrect_pattern`: failed regex verification (`UNSAFE_SERVER_KEY` only)",
+                "type": "object",
+                "additionalProperties": {
+                    "enum": [
+                        "missing",
+                        "too_small",
+                        "incorrect_pattern",
+                        "too_much",
+                        "invalid_type",
+                        "not_exist"
+                    ],
+                    "type": "string"
+                }
+            },
+            "UserBase": {
+                "title": "Root Type for UserResponse",
+                "description": "Basic Object, used in costruct of user",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "minLength": 3,
+                        "type": "string"
+                    },
+                    "username": {
+                        "description": "a unique value",
+                        "maxLength": 12,
+                        "minLength": 3,
+                        "type": "string"
+                    },
+                    "password": {
+                        "writeOnly": true,
+                        "maxLength": 10,
+                        "minLength": 6,
+                        "type": "string",
+                        "readOnly": false
+                    },
+                    "email": {
+                        "pattern": "^\\w+@\\w+\\.[\\w]{2}[\\w\\.]*",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "name": "Marcos Santos",
+                    "username": "marcs Sants",
+                    "email": "marcs@santos.com",
+                    "password": "adsfa@a2331"
+                }
+            },
+            "error_notFound": {
+                "title": "Root Type for error_notFound",
+                "description": "case the url is correct but the entity is not found, return this object",
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "not_found"
+                }
+            },
+            "postBase": {
+                "title": "Root Type for postBase",
+                "description": "The Base to create `post` object",
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string"
+                    },
+                    "private": {
+                        "type": "boolean"
+                    }
+                },
+                "example": {
+                    "userId": 2,
+                    "content": "",
+                    "private": false
+                }
+            },
+            "post_create": {
+                "title": "Root Type for post_create",
+                "description": "The creation object from `post`",
+                "required": [
+                    "userId"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/postBase"
+                    },
+                    {
+                        "required": [
+                            "content"
+                        ]
+                    }
+                ],
+                "properties": {
+                    "userId": {
+                        "writeOnly": false,
+                        "format": "int32",
+                        "type": "integer",
+                        "readOnly": false
+                    }
+                },
+                "example": {
+                    "userId": 1,
+                    "content": "a great day!",
+                    "private": false
+                }
+            },
+            "Post": {
+                "title": "Root Type for post",
+                "description": "the post object",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/postBase"
+                    }
+                ],
+                "properties": {
+                    "userId": {
+                        "writeOnly": false,
+                        "format": "int32",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "deleted": {
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "format": "int32",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "example": {
+                    "id": 1,
+                    "userId": 2,
+                    "content": "More other beautiful day",
+                    "deleted": false,
+                    "private": false,
+                    "createdAt": "2023-03-24T01:08:21.607Z",
+                    "updatedAt": "2023-03-24T01:08:21.607Z"
+                }
+            },
+            "User_create": {
+                "description": "The Object sended to create new `user`",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/UserBase"
+                    },
+                    {
+                        "required": [
+                            "name",
+                            "username",
+                            "password",
+                            "email"
+                        ]
+                    }
+                ]
+            },
+            "User": {
+                "title": "Root Type for Users",
+                "description": "The User Object",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/UserBase"
+                    }
+                ],
+                "properties": {
+                    "id": {
+                        "description": "",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "example": {
+                    "id": 2,
+                    "name": "Daniel Silva",
+                    "username": "Danixt",
+                    "email": "danie1@fsa.com",
+                    "createdAt": "2023-03-24T01:08:21.607Z",
+                    "updatedAt": "2023-03-24T01:08:21.607Z"
+                }
+            },
+            "Error_malformedData": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "error": {
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "props": {
+                                "description": "the object of properties with error",
+                                "type": "object",
+                                "additionalProperties": {
+                                    "$ref": "#/components/schemas/Error_Data_props"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "title": "Root Type for Error_invalidValue",
+                "description": "Returned when some property not is valid",
+                "type": "object",
+                "example": {
+                    "error": "malformed_data",
+                    "props": {
+                        "name": "too_small",
+                        "password": "missing"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "NOT_FOUND": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/error_notFound"
+                        }
+                    }
+                },
+                "description": "the entity was not found"
+            }
+        },
+        "securitySchemes": {
+            "SERVER_KEY": {
+                "type": "apiKey",
+                "description": "The primary server key token to access",
+                "name": "REDSOC_SERVER_KEY",
+                "in": "header"
+            },
+            "UNSAFE_SERVER_KEY": {
+                "type": "apiKey",
+                "description": "Used when a server-to-server connection is not completely reliable, that is, it does not (or does little) checks on the data before sending it to the API. if the connection is trusted use SERVER_KEY to skip checking properties",
+                "name": "REDSOC_SERVER_KEY",
+                "in": "header"
+            }
+        }
+    },
+    "security": [
+        {
+            "SERVER_KEY": [
+            ]
+        },
+        {
+            "UNSAFE_SERVER_KEY": [
+            ]
+        }
+    ],
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Operations to User Entities"
+        },
+        {
+            "name": "Posts",
+            "description": "Operations to manipulate user posts"
+        }
+    ]
+}
