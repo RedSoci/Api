@@ -5,13 +5,28 @@
         "version": "0.0.1",
         "description": "General API to database connect",
         "contact": {
-            "name": "Daniel Silva Rocha"
+            "name": "Daniel Silva Rocha",
+            "url": "https://github.com/RedSoci/Api"
         },
         "license": {
             "name": "MIT License",
             "url": "https://opensource.org/licenses/MIT"
         }
     },
+    "servers": [
+        {
+            "url": "http://{domain}:{port}/api/v1/server",
+            "description": "The main server entry point",
+            "variables": {
+                "domain": {
+                    "default": "localhost"
+                },
+                "port": {
+                    "default": "4040"
+                }
+            }
+        }
+    ],
     "paths": {
         "/users": {
             "summary": "Path used to manage the list of users.",
@@ -90,6 +105,9 @@
                     "403": {
                         "content": {
                             "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error_forbidden"
+                                },
                                 "examples": {
                                     "basic": {
                                         "value": {
@@ -189,6 +207,9 @@
                             }
                         },
                         "description": "Returned case the username already registred"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
                 "security": [
@@ -240,6 +261,9 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
                 "security": [
@@ -284,6 +308,9 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
                 "security": [
@@ -306,6 +333,9 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
                 "security": [
@@ -323,14 +353,119 @@
                     "name": "userId",
                     "description": "A unique identifier for a `User`.",
                     "schema": {
-                        "type": "string"
+                        "type": "integer"
                     },
                     "in": "path",
                     "required": true
                 }
             ]
         },
-        "/posts/{postId}": {
+        "/users/{userId}/posts": {
+            "summary": "Path used to manage the list of posts.",
+            "description": "The REST endpoint/path used to list and create zero or more `post` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
+            "servers": [
+                {
+                    "url": "http://{domain}:{port}/server/v1",
+                    "description": "The server entry point",
+                    "variables": {
+                        "domain": {
+                            "default": "localhost"
+                        },
+                        "port": {
+                            "default": "5005"
+                        }
+                    }
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Post"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns an array of `post` entities."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "getposts",
+                "summary": "List All posts",
+                "description": "Gets a list of all `post` entities."
+            },
+            "post": {
+                "requestBody": {
+                    "description": "A new `post` to be created.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/post_create"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Posts"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successful response."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "createpost",
+                "summary": "Create a post",
+                "description": "Creates a new instance of a `post`."
+            },
+            "parameters": [
+                {
+                    "name": "userId",
+                    "schema": {
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/users/{userId}/posts/{postId}": {
             "summary": "Path used to manage a single post.",
             "description": "The REST endpoint/path used to get, update, and delete single instances of an `post`.  This path contains `GET`, `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks, respectively.",
             "servers": [
@@ -364,6 +499,9 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
                 "security": [
@@ -444,37 +582,28 @@
             },
             "parameters": [
                 {
-                    "name": "postId",
+                    "name": "userId",
                     "description": "A unique identifier for a `post`.",
                     "schema": {
-                        "type": "string"
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                },
+                {
+                    "name": "postId",
+                    "schema": {
+                        "type": "integer"
                     },
                     "in": "path",
                     "required": true
                 }
             ]
         },
-        "/posts": {
-            "summary": "Path used to manage the list of posts.",
-            "description": "The REST endpoint/path used to list and create zero or more `post` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
-            "servers": [
-                {
-                    "url": "http://{domain}:{port}/server/v1",
-                    "description": "The server entry point",
-                    "variables": {
-                        "domain": {
-                            "default": "localhost"
-                        },
-                        "port": {
-                            "default": "5005"
-                        }
-                    }
-                }
-            ],
+        "/users/{userId}/devices": {
+            "summary": "Path used to manage the list of devices.",
+            "description": "The REST endpoint/path used to list and create zero or more `Device` entities.  This path contains a `GET` and `POST` operation to perform the list and create tasks, respectively.",
             "get": {
-                "tags": [
-                    "Posts"
-                ],
                 "responses": {
                     "200": {
                         "content": {
@@ -482,47 +611,49 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/Post"
+                                        "$ref": "#/components/schemas/Device"
                                     }
                                 }
                             }
                         },
-                        "description": "Successful response - returns an array of `post` entities."
+                        "description": "Successful response - returns an array of `Device` entities."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
-                "deprecated": false,
                 "security": [
-                    {
-                        "UNSAFE_SERVER_KEY": [
-                        ]
-                    },
                     {
                         "SERVER_KEY": [
                         ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
                     }
                 ],
-                "operationId": "getposts",
-                "summary": "List All posts",
-                "description": "Gets a list of all `post` entities."
+                "operationId": "getDevices",
+                "summary": "List All Devices",
+                "description": "Gets a list of all `Device` entities."
             },
             "post": {
                 "requestBody": {
-                    "description": "A new `post` to be created.",
+                    "description": "A new `Device` to be created.",
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/post_create"
+                                "$ref": "#/components/schemas/Device_create"
                             }
                         }
                     },
                     "required": true
                 },
-                "tags": [
-                    "Posts"
-                ],
                 "responses": {
                     "201": {
                         "description": "Successful response."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
                     }
                 },
                 "security": [
@@ -535,10 +666,201 @@
                         ]
                     }
                 ],
-                "operationId": "createpost",
-                "summary": "Create a post",
-                "description": "Creates a new instance of a `post`."
-            }
+                "operationId": "createDevice",
+                "summary": "Create a Device",
+                "description": "Creates a new instance of a `Device`."
+            },
+            "parameters": [
+                {
+                    "name": "userId",
+                    "schema": {
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/users/{userId}/devices/{deviceId}": {
+            "summary": "Path used to manage a single Device.",
+            "description": "The REST endpoint/path used to get, update, and delete single instances of an `Device`.  This path contains `GET`, `PUT`, and `DELETE` operations used to perform the get, update, and delete tasks, respectively.",
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Device"
+                                }
+                            }
+                        },
+                        "description": "Successful response - returns a single `Device`."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "getDevice",
+                "summary": "Get a Device",
+                "description": "Gets the details of a single instance of a `Device`."
+            },
+            "put": {
+                "requestBody": {
+                    "description": "Updated `Device` information.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceBase"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful response."
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "updateDevice",
+                "summary": "Update a Device",
+                "description": "Updates an existing `Device`."
+            },
+            "delete": {
+                "responses": {
+                    "204": {
+                        "description": "Successful response."
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/FORBIDDEN_TOKEN"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "operationId": "deleteDevice",
+                "summary": "Delete a Device",
+                "description": "Deletes an existing `Device`."
+            },
+            "parameters": [
+                {
+                    "name": "userId",
+                    "description": "A unique identifier for a `Device`.",
+                    "schema": {
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                },
+                {
+                    "name": "deviceId",
+                    "schema": {
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/users/{userId}/devices/{deviceId}/auth": {
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/passRefresh"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "The passed Refresh Token is valid"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NOT_FOUND"
+                    },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error_invalidToken"
+                                }
+                            }
+                        },
+                        "description": "Returned case the refreshToken is invalid or expired"
+                    }
+                },
+                "security": [
+                    {
+                        "SERVER_KEY": [
+                        ]
+                    },
+                    {
+                        "UNSAFE_SERVER_KEY": [
+                        ]
+                    }
+                ],
+                "summary": "Check refreshToken",
+                "description": "For security question to check the refresh token is required to pass the token in POST mode"
+            },
+            "parameters": [
+                {
+                    "name": "userId",
+                    "schema": {
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                },
+                {
+                    "name": "deviceId",
+                    "schema": {
+                        "type": "integer"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
         }
     },
     "components": {
@@ -780,6 +1102,136 @@
                         "password": "missing"
                     }
                 }
+            },
+            "error_forbidden": {
+                "title": "Root Type for error_forbidden",
+                "description": "Forbidden action or request, `forbidden action` occurs when the access is valid, but the form of request not is, `forbidden_request` in case the token is not valid.",
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "enum": [
+                            "forbidden_request",
+                            "forbidden_action"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "forbidden_action"
+                }
+            },
+            "Device_create": {
+                "title": "Root Type for Device_create",
+                "description": "The base to create new device",
+                "required": [
+                    "refreshtoken"
+                ],
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/DeviceBase"
+                    },
+                    {
+                        "required": [
+                            "name",
+                            "refreshtoken"
+                        ]
+                    }
+                ],
+                "example": {
+                    "name": "Android",
+                    "refreshtoken": "KWEMFSOAJWNJDNAKDMALKDWLKDAKDASLMCWOQPJFO"
+                }
+            },
+            "DeviceBase": {
+                "title": "Root Type for Device",
+                "description": "The registred device used to store the refresh tokens",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "format": "int32",
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "refreshtoken": {
+                        "writeOnly": true,
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "id": 2,
+                    "userId": 5,
+                    "name": "Computer"
+                }
+            },
+            "passRefresh": {
+                "title": "Root Type for passRefresh",
+                "description": "",
+                "required": [
+                    "refreshtoken"
+                ],
+                "type": "object",
+                "properties": {
+                    "refreshtoken": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "refreshtoken": "RvmweQonmfenmwAomfwnr"
+                }
+            },
+            "Error_invalidToken": {
+                "title": "Root Type for Error_invalidToken",
+                "description": "Token is invalid",
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "enum": [
+                            "invalid",
+                            "expired"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "invalid"
+                }
+            },
+            "Device": {
+                "title": "Root Type for Device",
+                "description": "",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/DeviceBase"
+                    }
+                ],
+                "properties": {
+                    "userid": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "example": {
+                    "userid": 3,
+                    "id": 2,
+                    "name": "android",
+                    "createdAt": "2023-03-24T01:08:21.607Z",
+                    "updatedAt": "2023-03-24T01:08:21.607Z"
+                }
             }
         },
         "responses": {
@@ -791,7 +1243,17 @@
                         }
                     }
                 },
-                "description": "the entity was not found"
+                "description": "Entity not found"
+            },
+            "FORBIDDEN_TOKEN": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/error_forbidden"
+                        }
+                    }
+                },
+                "description": "Server token not is valid"
             }
         },
         "securitySchemes": {
