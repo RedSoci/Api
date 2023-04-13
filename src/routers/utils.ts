@@ -1,21 +1,19 @@
 import { Response } from "express";
 import { FindOptions,Model, ModelStatic, WhereOptions } from "sequelize";
-import { ResultsFromRequest,defaultResponse } from "./Response";
-/**
- * Send response in default API format
- * @param res response object
- * @param status the status code
- * @param result legible human/computer info
- * @param data 
- * @param message 
- */
-export const Resp = (res:Response,status:number,result:ResultsFromRequest,data?:any,message?:string)=>{
-    res.status(status);
-    res.send(<defaultResponse>{
-        result,
-        data,
-        message
-    })
+
+export const Resps = {
+    not_found:(res:Response<any>)=>{
+        res.status(404).send({
+            error:"not_found"
+        })
+    },
+    invalid_id:(res:Response<any>,id:string)=>{
+        res.status(400).send({
+            error:"invalid_id",
+            message:"passed id is invalid",
+            id
+        })
+    }
 }
 export class ResponseList<M extends Model>{
     private model:ModelStatic<M>;
@@ -46,9 +44,10 @@ export class ResponseList<M extends Model>{
             this._page = value
         }
     }
-    findAll(additional:FindOptions<M> = {}){
+    async findAll(additional:FindOptions<M> = {},json = false){
         var send = Object.assign(this.getOps(),additional);
-        return this.model.findAll(send);
+        var result =await this.model.findAll(send)
+        return json ? result.map((e)=>e.toJSON()) : result;
     }
     findOne(additional:FindOptions<M> = {}){
         var send = Object.assign(additional);
@@ -67,7 +66,10 @@ export class ResponseList<M extends Model>{
         return ops
     }
 }
-export function GetId(value:string | number){
+/**
+ * Convert string to number, case fail return `null`
+ */
+export function GetId(value:string | number):number | null{
     if(typeof value === "number"){
         return value
     }

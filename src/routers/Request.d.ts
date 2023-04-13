@@ -29,4 +29,4 @@ export type PostRequest<attrs> = Request<null,null,attrs>
  * 
  * ```
  */
-export type GetRequestById<attrs = null> = Request<{"id":number},null,attrs>
+export type GetRequestById<attrs = null> = Request<{"userId":number},null,attrs>

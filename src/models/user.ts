@@ -6,7 +6,8 @@ export interface userSchemaAttributes {
     name:String,
     username:string,
     email:string,
-    password:string
+    password:string,
+    lastLogin:Date
 }
 type creationAttrs  = Optional<userSchemaAttributes,"id">
 const obj:ModelAttributes<Model<userSchemaAttributes,creationAttrs>,userSchemaAttributes> = {
@@ -29,6 +30,10 @@ const obj:ModelAttributes<Model<userSchemaAttributes,creationAttrs>,userSchemaAt
     password:{
         type:DataTypes.STRING(56),
         allowNull:false
+    },
+    lastLogin:{
+        type:DataTypes.DATE,
+        allowNull:true
     }
 }
 export const userModel =database.define('user',obj);

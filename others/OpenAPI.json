@@ -70,22 +70,6 @@
                             "type": "string"
                         },
                         "in": "query"
-                    },
-                    {
-                        "examples": {
-                            "basic": {
-                                "value": "name,\"Daniel%\",email,\"dan%\""
-                            }
-                        },
-                        "name": "filter",
-                        "description": "Filter results",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "in": "query"
                     }
                 ],
                 "responses": {

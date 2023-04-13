@@ -4,7 +4,7 @@ if(!process.env.NODE_ENV){
     process.env.NODE_ENV = "development";
     console.warn("No NODE_ENV defined, defined to \"development\"");
 }
-const SERVER_PATH = "server"
+const SERVER_PATH = "/server/v1"
 import { database } from "./db";
 
 
@@ -12,7 +12,7 @@ import userRouter from "./routers/server/user";
 import * as express from "express"
 
 import { userModel } from "./models/user";
-import { messageModel } from "./models/message";
+import { postModel } from "./models/post";
 import { followModel } from "./models/follow";
 if(require.main === module){
     start()
@@ -23,10 +23,10 @@ export async function start() {
         timeout:5000,
         backoffBase:500
     }});
-    userModel.hasMany(messageModel,{foreignKey:'userid',onDelete:"CASCADE"})
+    userModel.hasMany(postModel,{foreignKey:'userid',onDelete:"CASCADE"})
     userModel.hasMany(followModel,{foreignKey:'follow'})
     userModel.hasOne(followModel,{foreignKey:"user"})
-    for(const schema of [userModel,messageModel,followModel]){
+    for(const schema of [userModel,postModel,followModel]){
         await schema.sync({alter:true})
     }
     await database.sync();
@@ -34,7 +34,7 @@ export async function start() {
     var app = express()
     
     app.use(express.json())
-    app.use("/server",userRouter)
+    app.use(SERVER_PATH,userRouter)
     
     app.listen(4000)
 }

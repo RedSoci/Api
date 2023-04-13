@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc && node build/rename.js",
     "start": "NODE_PATH=./dist node ./dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "test":"mocha"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",

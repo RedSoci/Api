@@ -1,15 +1,15 @@
 import { database } from "../db";
 import {DataTypes, Model, ModelAttributes, Optional} from "sequelize";
-export interface messageSchemaAttributes{
+export interface postSchemaAttributes{
     id:number,
     content:string,
     deleted:boolean,
     private:boolean,
     userid:number
 }
-type creationAttrs  = Optional<messageSchemaAttributes,"id">
+type creationAttrs  = Optional<postSchemaAttributes,"id">
 
-export const messageModel = database.define('message',<ModelAttributes<Model<messageSchemaAttributes,creationAttrs>,messageSchemaAttributes>>{
+export const postModel = database.define('post',<ModelAttributes<Model<postSchemaAttributes,creationAttrs>,postSchemaAttributes>>{
     userid:{
         type:DataTypes.INTEGER
     },
