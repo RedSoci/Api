@@ -4,7 +4,7 @@ if(!process.env.NODE_ENV){
     process.env.NODE_ENV = "development";
     console.warn("No NODE_ENV defined, defined to \"development\"");
 }
-const SERVER_PATH = "/server/v1"
+export const SERVER_PATH = "/server/v1"
 import { database } from "./db";
 
 
