@@ -1,13 +1,8 @@
 //Make tests from utilities.
 var assert = require('assert');
-var utilsRouters = require("../dist/routers/utils.js");
-var server = require("../dist/index.js");
-
-before(function(done){
-    server.start().finally(done)
-})
 
 describe('utilities tests',function(){
+    var utilsRouters = require("../dist/routers/utils.js");
     const getId = utilsRouters.GetId;
 
     it("getId():return integer number from string",function(){

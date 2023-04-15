@@ -5,7 +5,7 @@ if(!process.env.NODE_ENV){
     console.warn("No NODE_ENV defined, defined to \"development\"");
 }
 export const SERVER_PATH = "/server/v1"
-import { database } from "./db";
+import { getDb } from "./db";
 
 
 import userRouter from "./routers/server/user";
@@ -18,6 +18,7 @@ if(require.main === module){
     start()
 }
 export async function start() {
+    const database = getDb()
     await database.authenticate({logging:true,retry:{
         max:8,
         timeout:5000,

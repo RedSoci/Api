@@ -6,7 +6,7 @@
     "build": "tsc && node build/rename.js",
     "start": "NODE_PATH=./dist node ./dist/index.js",
     "dev": "nodemon src/index.ts",
-    "test":"mocha"
+    "test": "mocha"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
@@ -18,8 +18,11 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/express": "^4.17.17",
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.21",
+    "sqlite3": "^5.1.6",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   }
