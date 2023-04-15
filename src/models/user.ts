@@ -1,6 +1,6 @@
-import { database } from "../db";
+import { getDb } from "../db";
 import {DataTypes,Model,ModelAttributes, Optional} from "sequelize";
-
+const database = getDb()
 export interface userSchemaAttributes {
     id:number,
     name:String,

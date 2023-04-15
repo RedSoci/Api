@@ -1,5 +1,8 @@
-import { database } from "../db";
-import {DataTypes, Model, ModelAttributes, Optional} from "sequelize";
+import { getDb } from "../db"
+import {DataTypes, Model, ModelAttributes, Optional} from "sequelize"
+
+const database = getDb()
+
 export interface postSchemaAttributes{
     id:number,
     content:string,
