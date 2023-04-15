@@ -5,7 +5,7 @@ if(!process.env.NODE_ENV){
     console.warn("No NODE_ENV defined, defined to \"development\"");
 }
 export const SERVER_PATH = "/server/v1"
-import { getDb } from "./db";
+import { database } from "./db";
 
 
 import userRouter from "./routers/server/user";
@@ -14,14 +14,10 @@ import * as express from "express"
 import { userModel } from "./models/user";
 import { postModel } from "./models/post";
 import { followModel } from "./models/follow";
-
-export var app = express()
-
 if(require.main === module){
     start()
 }
 export async function start() {
-    var database = getDb();
     await database.authenticate({logging:true,retry:{
         max:8,
         timeout:5000,
@@ -34,6 +30,8 @@ export async function start() {
         await schema.sync({alter:true})
     }
     await database.sync();
+
+    var app = express()
     
     app.use(express.json())
     app.use(SERVER_PATH,userRouter)

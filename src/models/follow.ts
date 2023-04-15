@@ -1,6 +1,5 @@
-import { getDb } from "../db";
+import { database } from "../db";
 import {DataTypes, Model, ModelAttributes, Optional} from "sequelize";
-const database = getDb()
 //userId follows followId
 export interface followSchemaAttributes{
     id:number,
