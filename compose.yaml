@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       target: production
     volumes:
-      - ./src:/usr/src/app
+      - ./src:/usr/src/app/src
     ports:
       - '8080:4000'
     depends_on:
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
       target: test
     volumes:
-      - ./src:/usr/src/app
+      - ./src:/usr/src/app/src
     ports:
       - '8080:4000'
     depends_on:

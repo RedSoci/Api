@@ -18,4 +18,3 @@ ENV NODE_PATH=./lib
 FROM base as test
 
 ARG NODE_ENV=development
-RUN npm ci
