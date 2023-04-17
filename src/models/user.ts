@@ -1,6 +1,4 @@
-import { getDb } from "../db";
-import {DataTypes,Model,ModelAttributes, Optional} from "sequelize";
-const database = getDb()
+import {DataTypes,Model,ModelAttributes, Optional, Sequelize} from "sequelize";
 export interface userSchemaAttributes {
     id:number,
     name:String,
@@ -36,4 +34,7 @@ const obj:ModelAttributes<Model<userSchemaAttributes,creationAttrs>,userSchemaAt
         allowNull:true
     }
 }
-export const userModel =database.define('user',obj);
+export const userModelAttributes = obj;
+export function getUserModel(database:Sequelize){
+    return database.define('user',obj);
+}

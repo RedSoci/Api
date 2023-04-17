@@ -1,6 +1,4 @@
-import { getDb } from "../db";
-import {DataTypes, Model, ModelAttributes, Optional} from "sequelize";
-const database = getDb()
+import {DataTypes, Model, ModelAttributes, Optional, Sequelize} from "sequelize";
 export interface postSchemaAttributes{
     id:number,
     content:string,
@@ -8,9 +6,7 @@ export interface postSchemaAttributes{
     private:boolean,
     userid:number
 }
-type creationAttrs  = Optional<postSchemaAttributes,"id">
-
-export const postModel = database.define('post',<ModelAttributes<Model<postSchemaAttributes,creationAttrs>,postSchemaAttributes>>{
+export const postModelAttributes = <ModelAttributes<Model<postSchemaAttributes,creationAttrs>,postSchemaAttributes>>{
     userid:{
         type:DataTypes.INTEGER
     },
@@ -30,4 +26,9 @@ export const postModel = database.define('post',<ModelAttributes<Model<postSchem
         type:DataTypes.BOOLEAN,
         defaultValue:false
     }
-});
+};
+type creationAttrs  = Optional<postSchemaAttributes,"id">
+export function getPostModel(database:Sequelize){
+    return database.define('post',postModelAttributes);
+
+}

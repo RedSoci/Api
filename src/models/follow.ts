@@ -1,14 +1,13 @@
 import { getDb } from "../db";
-import {DataTypes, Model, ModelAttributes, Optional} from "sequelize";
+import {DataTypes, Model, ModelAttributes, Optional, Sequelize} from "sequelize";
 //userId follows followId
-const database = getDb()
 export interface followSchemaAttributes{
     id:number,
     userId:number,
     followId:number
 }
 type creationAttrs  = Optional<followSchemaAttributes,"id">
-export const followModel = database.define('follow',<ModelAttributes<Model<followSchemaAttributes,creationAttrs>,followSchemaAttributes>>{
+export const followModelAttributes = <ModelAttributes<Model<followSchemaAttributes,creationAttrs>,followSchemaAttributes>>{
     id:{
         type:DataTypes.INTEGER,
         primaryKey:true,
@@ -24,4 +23,8 @@ export const followModel = database.define('follow',<ModelAttributes<Model<follo
         primaryKey:true,
         onDelete:"CASCADE"
     }
-});
+}
+export function getFollowModel(db:Sequelize){
+    const database =db;
+    return database.define('follow',followModelAttributes);
+} 

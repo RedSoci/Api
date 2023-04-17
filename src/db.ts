@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import {dbconfig} from "./config/db"
+import {getConfig} from "./config/db"
 var db:Sequelize;
 export function getDb(){
     if(!db){
@@ -11,7 +11,7 @@ export function getDb(){
                     acquire:200
                 }
             },
-            dbconfig
+            getConfig()
             )
         )
     }
