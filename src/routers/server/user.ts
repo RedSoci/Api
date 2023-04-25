@@ -1,12 +1,17 @@
 import * as express from "express"
 import { Response,NextFunction } from "express"
 import { getUserModel,userSchemaAttributes } from "../../models/user"
-import * as CryptoJs from "crypto-js"
+import * as Crypto from 'crypto';
+
 import {GetId, ResponseList,Resps} from "../utils"
 import { GetRequest,GetRequestById, PostRequest } from "../Request"
 import {Sequelize } from "sequelize"
 
-const {SHA224} = CryptoJs;
+function SHA224(text:string){
+    var hash = Crypto.createHash('sha224');
+    var data = hash.update(text,'utf-8')
+    return data.digest('hex');
+}
 export var PATH_ROUTER = "/users"
 const RETURN_ATTRS = ["name","username","email","createdAt","updatedAt","id"]
 
@@ -58,7 +63,7 @@ export default function getUserRouter(db:Sequelize,pathRout?:string){
             })
             return;
         }
-        var cryptedPassword = SHA224(password).toString();
+        var cryptedPassword = SHA224(password);
         try{
             await userModel.create({
                 email,
@@ -90,7 +95,7 @@ export default function getUserRouter(db:Sequelize,pathRout?:string){
         if(info.username || info.password){
             var where:{[index:string]:any} = {}
             if(info.password){
-                where.password = SHA224(info.password).toString()
+                where.password = SHA224(info.password)
             }
             if(info.username){
                 where.username = info.username
