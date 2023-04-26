@@ -6,9 +6,11 @@ export interface postSchemaAttributes{
     private:boolean,
     userid:number
 }
-export const postModelAttributes = <ModelAttributes<Model<postSchemaAttributes,creationAttrs>,postSchemaAttributes>>{
+export const postModelAttributes:ModelAttributes<Model<postSchemaAttributes,creationAttrs>,postSchemaAttributes> ={
     userid:{
-        type:DataTypes.INTEGER
+        allowNull:true,
+        type:DataTypes.INTEGER,
+        references:{key:'id',model:'users'}
     },
     id:{
         type:DataTypes.INTEGER,

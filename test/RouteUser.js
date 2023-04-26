@@ -7,7 +7,7 @@ const {SERVER_PATH,PORT} = require("../dist/index.js")
 const { PATH_ROUTER } = require("../dist/routers/server/user.js")
 
 const USER_ROUTER = SERVER_PATH +PATH_ROUTER;
-const SERVER_URL = "http://localhost:"+PORT;
+const SERVER_URL = (process.env.TEST_SERVER_URL || "http://localhost:")+PORT;
 const SERVER_TOKEN = process.env.SERVER_TOKEN_UNSAFE_ORIGIN || 'unsafe'
 function getRequestObj(method = "GET") {
     return {
@@ -25,7 +25,9 @@ const {getUserModel} = require("../dist/models/user.js");
 const { getDb } = require('../dist/db.js');
 const { Generator } = require('./utils/gen.js');
 const http = require('http');
-describe(USER_ROUTER,function(){
+const { RequestJson } = require('./utils/request.js');
+const req = new RequestJson(USER_ROUTER);
+describe("USERS",function(){
     beforeEach(async function(){
         /**@type {import('sequelize').ModelStatic<any>} */
         const userModel = getUserModel(getDb());
@@ -43,10 +45,7 @@ describe(USER_ROUTER,function(){
         //create 12 user to be inputed, but return only 10.
         var users = createUserObj(12);
         for(const user of users){
-            await new Promise(end =>{
-                var req = http.request(getRequestObj('POST'),end)
-                req.end(JSON.stringify(user))
-            })
+            await req.post(user);
         }
         chai.request(SERVER_URL).get(USER_ROUTER).set("UNSAFE_SERVER_KEY",SERVER_TOKEN).end((err,res)=>{
             expect(err).to.be.null;
@@ -71,6 +70,35 @@ describe(USER_ROUTER,function(){
         })
         req.end(JSON.stringify(user));
 
+    })
+    it("should GET user by id param",async function(){
+        var user = createUserObj();
+        await req.post(user);
+        var res =await req.get();
+        var userId = res[0].id;
+        var getData =await req.in(USER_ROUTER+"/"+userId).get();
+        expect(getData).to.have.property('username',user.username);
+    })
+    it("should DELETE user by id param",function(done){
+        req.post(createUserObj())
+        .then(()=>req.get())
+        .then((userObj)=>{
+            var getId = userObj[0].id;
+            chai.request(SERVER_URL).delete(USER_ROUTER+"/"+getId).set("UNSAFE_SERVER_KEY",SERVER_TOKEN).end(async (err,res)=>{
+                var failed = false;
+                try{
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(204);
+                    var clearList = await req.get();
+                    expect(clearList).to.be.empty;
+                }catch(e){
+                    done(e);
+                    failed = true;
+                }
+                if(!failed)
+                    done();
+            })
+        });
     })
     describe('check safety',function(){
         function basicExpect(err,res){

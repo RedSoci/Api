@@ -6,6 +6,7 @@ export const PORT =process.env.SERVER_PORT || 4000;
 import { getDb } from "./db";
 
 import userRouter from "./routers/server/user";
+import postRouter from "./routers/server/post";
 import * as express from "express"
 
 import { getUserModel } from "./models/user";
@@ -52,7 +53,9 @@ export async function start(ops:startOpts = {}) {
     const postModel = getPostModel(database);
     const userModel = getUserModel(database);
 
-    userModel.hasMany(postModel,{foreignKey:'userid',onDelete:"CASCADE"})
+    userModel.hasMany(postModel,{onDelete:"CASCADE",foreignKey:{name:'userid',allowNull:false},constraints:true});
+    postModel.belongsTo(userModel,{constraints:true,foreignKey:{name:'userid',allowNull:false}});
+
     userModel.hasMany(followModel,{foreignKey:'follow'})
     userModel.hasOne(followModel,{foreignKey:"user"})
     for(const schema of [userModel,postModel,followModel]){
@@ -76,5 +79,6 @@ export async function start(ops:startOpts = {}) {
         res.status(403).send({error:"forbidden_action"}).end();
     }
     app.use(SERVER_PATH,auth,userRouter(database))
+    app.use(SERVER_PATH,auth,postRouter(database))
     return app.listen(PORT)
 }

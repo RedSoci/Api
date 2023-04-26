@@ -17,7 +17,7 @@ export type GetDefaultQueries<dbTables extends {} = {}> = {
 /**
  * Default pattern to resource request
  */
-export type GetRequest<attrs> = Request<null,null,GetDefaultQueries<attrs>,GetDefaultQueries<attrs>>
+export type GetRequest<attrs,params=null> = Request<params,null,GetDefaultQueries<attrs>,GetDefaultQueries<attrs>>
 /**
  * Default pattern to resource request
  */

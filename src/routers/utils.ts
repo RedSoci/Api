@@ -1,7 +1,22 @@
-import { Response } from "express";
+import { Response,Request } from "express";
 import { FindOptions,Model, ModelStatic, WhereOptions } from "sequelize";
 
 export const Resps = {
+    internal_error:(res:Response<any>,req:Request<any,any,any,any>,error:any)=>{
+        //TODO make system to auto report internal errors.
+        var message:any = error;
+        if(process.env.NODE_ENV === "production"){
+            message = "Internal failure"
+        };
+        res.status(500).send({error:"internal_error",data:message})
+    },
+    bad_request:(res:Response<any>,message?:string)=>{
+        var obj:{error:string,message?:string} = {error:"bad_request"};
+        if(message){
+            obj.message = message;
+        }
+        res.status(400).send(obj)
+    },
     not_found:(res:Response<any>)=>{
         res.status(404).send({
             error:"not_found"
