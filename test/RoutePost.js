@@ -67,6 +67,26 @@ describe("POSTS",()=>{
 
         }
     })
+    it("should DELETE post",function(done){
+        req.post({userid:usersId[0],content:'any'})
+        .then(()=>{
+            req.get()
+            .then(e =>{
+                var id = e[0].id;
+                if(typeof id != 'number'){
+                    done(new Error('Invalid returned value, user not added in test'));
+                    return;
+                }
+                chai.request(SERVER_URL).delete(POST_ROUTER+"/"+id).set(...serverKey).end((err,res)=>{
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(204);
+                    done()
+                })
+            })
+            .catch(done);
+        })
+        .catch(done);
+    })
     it("should NOT POST new post",function(done){
         var invalidPost = {userId:(usersId[1] + 324),content:'other good day'};
         chai.request(SERVER_URL).post(POST_ROUTER).set(...serverKey).send(invalidPost).end((err,res)=>{

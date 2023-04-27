@@ -10,19 +10,19 @@ export const Resps = {
         };
         res.status(500).send({error:"internal_error",data:message})
     },
-    bad_request:(res:Response<any>,message?:string)=>{
+    bad_request:(res:Response,message?:string)=>{
         var obj:{error:string,message?:string} = {error:"bad_request"};
         if(message){
             obj.message = message;
         }
         res.status(400).send(obj)
     },
-    not_found:(res:Response<any>)=>{
+    not_found:(res:Response)=>{
         res.status(404).send({
             error:"not_found"
         })
     },
-    invalid_id:(res:Response<any>,id:string)=>{
+    invalid_id:(res:Response,id:string)=>{
         res.status(400).send({
             error:"invalid_id",
             message:"passed id is invalid",
