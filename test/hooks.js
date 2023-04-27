@@ -12,7 +12,7 @@ before(async function(){
         process.env.DB_LOG = "false";
     }
     app.use((req,res,next)=>{
-        write.write(req.method + ':'+req.url + '\n' + (body ? ' body: '+body:''));
+        write.write(req.method + ':'+req.url + '\n');
         next()
     })
     server =await start({force:true});

@@ -38,7 +38,7 @@ export default function getUserRouter(db:Sequelize,pathRout?:string){
     
     //Operations specifies users using id
     userRouter.get(PATH_ROUTER+"/:userId",getUser)
-    userRouter.post(PATH_ROUTER+"/:userId",updateUser)
+    userRouter.put(PATH_ROUTER+"/:userId",updateUser)
     userRouter.delete(PATH_ROUTER+"/:userId",deleteUser)
     
     async function newUser(req:postRequest,res:Response<any>){
@@ -129,7 +129,7 @@ export default function getUserRouter(db:Sequelize,pathRout?:string){
         if(!result[0]){
             Resps.not_found(res);
         }else{
-            res.status(201).end();
+            res.status(202).end();
         }
     }
     async function deleteUser(req:GetRequestById,res){

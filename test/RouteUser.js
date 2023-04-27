@@ -100,6 +100,21 @@ describe("USERS",function(){
             })
         });
     })
+    it("should PUT user",function(done){
+        req.post(createUserObj()).then(()=>{
+            req.get().then(e =>{
+                var id = e[0].id;
+                chai.request(SERVER_URL).put(USER_ROUTER+'/'+id).send({name:'the new name'}).set("UNSAFE_SERVER_KEY",SERVER_TOKEN).end((err,res)=>{
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(202);
+                    req.in(USER_ROUTER+'/'+id).get().then(e =>{
+                        expect(e).to.have.property('name','the new name');
+                        done()
+                    }).catch(done)
+                })
+            }).catch(done)
+        }).catch(done)
+    })
     describe('check safety',function(){
         function basicExpect(err,res){
             expect(err).to.be.null;
