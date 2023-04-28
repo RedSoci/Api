@@ -35,7 +35,7 @@ export default function getPostRouter(db:Sequelize,pathRout?:string,pathRoutFrom
     async function postReceiver(req:getRequest,res:Response) {
         var userId =GetId(req.params?.userId || req.body?.userid)
         if(typeof req.body.content != 'string'){
-            Resps.bad_request(res,"invalid content data");
+            Resps.malformed_data(res,{content:'invalid_type'});
             return;
         }
         if(userId === null){
@@ -51,7 +51,7 @@ export default function getPostRouter(db:Sequelize,pathRout?:string,pathRoutFrom
             res.status(201).end();
         }catch(e){
             if(e.name === "SequelizeForeignKeyConstraintError"){
-                Resps.bad_request(res,'User not exist');
+                Resps.not_found(res);
             }else{
                 res.status(500).send({error:"unknown",name:e.name,data:process.env.NODE_ENV === 'development'? e : ''});
             }
@@ -76,14 +76,14 @@ export default function getPostRouter(db:Sequelize,pathRout?:string,pathRoutFrom
         var params:{content?:string,private?:boolean};
         if(body.content){
             if(typeof body.content != 'string'){
-                Resps.bad_request(res,'invalid type in property content');
+                Resps.malformed_data(res,{content:'invalid_type'});
                 return;
             }
             params.content = body.content;
         }
         if(body.private != undefined){
             if(typeof body.private != "boolean"){
-                Resps.bad_request(res,'invalid type in property private');
+                Resps.malformed_data(res,{private:'invalid_type'});
                 return;
             }
             params.private = body.private;

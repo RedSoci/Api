@@ -1,6 +1,9 @@
 import { Response,Request } from "express";
 import { FindOptions,Model, ModelStatic, WhereOptions } from "sequelize";
-
+export type validationErrors = 'incorrect_pattern'|'missing'|'invalid_type'|'min_violation'|'max_violation'|'not_exist'
+export interface DescPropsFaileds{
+    [index:string]:validationErrors
+}
 export const Resps = {
     internal_error:(res:Response<any>,req:Request<any,any,any,any>,error:any)=>{
         //TODO make system to auto report internal errors.
@@ -10,23 +13,21 @@ export const Resps = {
         };
         res.status(500).send({error:"internal_error",data:message})
     },
-    bad_request:(res:Response,message?:string)=>{
-        var obj:{error:string,message?:string} = {error:"bad_request"};
-        if(message){
-            obj.message = message;
-        }
+    malformed_data:(res:Response,props:DescPropsFaileds = {})=>{
+        var obj:{error:string,props:DescPropsFaileds} = {error:"malformed_data",props};
         res.status(400).send(obj)
     },
-    not_found:(res:Response)=>{
+    not_found:(res:Response,isPage?:boolean)=>{
         res.status(404).send({
-            error:"not_found"
+            error:"not_found",
+            type:isPage ? 'path':'object',
+            message:isPage ? 'Page not found':'object not found'
         })
     },
     invalid_id:(res:Response,id:string)=>{
         res.status(400).send({
-            error:"invalid_id",
-            message:"passed id is invalid",
-            id
+            error:"malformed_data",
+            props:{[id]:'invalid_type'}
         })
     }
 }

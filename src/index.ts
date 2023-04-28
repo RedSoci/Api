@@ -14,6 +14,7 @@ import { getPostModel } from "./models/post";
 import { getFollowModel } from "./models/follow";
 
 import { Sequelize } from "sequelize";
+import { Resps } from "./routers/utils";
 
 export var app = express()
 const SERVER_TOKEN_TRUSTED_ORIGIN = process.env.SERVER_KEY || "trusted";
@@ -80,5 +81,9 @@ export async function start(ops:startOpts = {}) {
     }
     app.use(SERVER_PATH,auth,userRouter(database))
     app.use(SERVER_PATH,auth,postRouter(database))
+    
+    app.use('*',function(req,res){
+        Resps.not_found(res,true);
+    })
     return app.listen(PORT)
 }
