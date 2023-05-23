@@ -47,7 +47,10 @@ services:
       - dev
   db:
     container_name: db
-    image: postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dbase
     restart: always
     command: -p 3200
     environment: 

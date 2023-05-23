@@ -1,5 +1,5 @@
 import {config} from "dotenv"
-config();
+config({override:false});
 export const SERVER_PATH = "/server/v1"
 export const PORT =process.env.SERVER_PORT || 4000;
 
@@ -15,8 +15,18 @@ import { getFollowModel } from "./models/follow";
 
 import { Sequelize } from "sequelize";
 import { Resps } from "./routers/utils";
+import { log } from "./log";
+import { Rest } from "./Rest";
 
 export var app = express()
+app.use('*',(req,res,next)=>{
+    log.info({
+        method:req.method,
+        path:req.path,
+        origin:req.ip
+    },'request');
+    next()
+})
 const SERVER_TOKEN_TRUSTED_ORIGIN = process.env.SERVER_KEY || "trusted";
 const SERVER_TOKEN_UNSAFE_ORIGIN = process.env.SERVER_KEY_UNSAFE || "unsafe";
 if(require.main === module){
@@ -34,6 +44,7 @@ interface startOpts{
 
 export async function start(ops:startOpts = {}) {
     const NODE_ENV = process.env.NODE_ENV;
+    log('Starting process','start');
     var force  = ops.force ? true : false;
     if(force && NODE_ENV === "production"){
         throw new Error("Unable to force database to rebuild in production mode")
@@ -53,7 +64,8 @@ export async function start(ops:startOpts = {}) {
     const followModel = getFollowModel(database);
     const postModel = getPostModel(database);
     const userModel = getUserModel(database);
-
+    var a = new Rest(postModel);
+    a.create({})
     userModel.hasMany(postModel,{onDelete:"CASCADE",foreignKey:{name:'userid',allowNull:false},constraints:true});
     postModel.belongsTo(userModel,{constraints:true,foreignKey:{name:'userid',allowNull:false}});
 

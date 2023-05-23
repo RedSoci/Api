@@ -1,4 +1,6 @@
 import development from "./dbDev"
+import {config as dotenv} from "dotenv"
+dotenv({override:false});
 var dvServer = development
 function getConfig(){
     var env = process.env;
@@ -28,7 +30,7 @@ function getConfig(){
         dbconfig.port = env.DB_PORT;
     }
     if(env.DB_LOG){
-        dbconfig.logging = env.DB_LOG === "true" ? console.log : false;
+        dbconfig.logging = env.DB_LOG === "true" ? (e)=>console.log('#DATABASE:',e) : false;
     }
     return dbconfig
 }

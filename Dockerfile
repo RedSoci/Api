@@ -18,3 +18,6 @@ ENV NODE_PATH=./lib
 FROM base as test
 
 ARG NODE_ENV=development
+
+FROM postgres as dbase
+COPY ./others/*.sql /docker-entrypoint-initdb.d/

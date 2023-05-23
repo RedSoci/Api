@@ -2,8 +2,10 @@ const { join } = require("path");
 var {start,app} = require("../dist/index.js");
 var server;
 var {createWriteStream,mkdirSync,existsSync} = require('fs');
+let {setOut} = require('../dist/log.js')
 var write;
 before(async function(){
+    setOut([]);
     if(!process.env.AUTOMATED_TEST){
         if(!existsSync('logs'))
             mkdirSync('logs')
